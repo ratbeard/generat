@@ -21,8 +21,11 @@
     "url": "https://github.com/ratbeard/generate-a/issues"
   },
   "homepage": "https://github.com/ratbeard/generate-a",
-	"preferGlobal": "true",
-	"bin": {
-			"generate-a" : "CLI.coffee"
-	}
+  "preferGlobal": "true",
+  "bin": {
+    "generat": "CLI.coffee"
+  },
+  "devDependencies": {
+    "nodemon": "~1.0.14"
+  }
 }

@@ -172,7 +172,7 @@ class DryRunApiImplementation
 #
 readGeneratorFile = ->
 	projectDir = process.cwd()
-	templateDirPath = path.join(projectDir, "generate-a-templates")
+	templateDirPath = path.join(projectDir, "generat-templates")
 	templateDefinitionFile = path.join(templateDirPath, "templates.coffee")
 
 	if !exists(templateDirPath)
@@ -220,7 +220,7 @@ for argName, i in template.args
 {runFn} = template
 
 # Give it a dry run
-runFn()
+#runFn()
 
 # Run it for real!
 api.isForReal = true
