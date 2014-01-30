@@ -2,7 +2,7 @@
   "name": "generate-a",
   "version": "0.0.0",
   "description": "Template generator for a local project",
-  "main": "index.js",
+  "main": "index.coffee",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/ratbeard/generate-a/issues"
   },
-  "homepage": "https://github.com/ratbeard/generate-a"
+  "homepage": "https://github.com/ratbeard/generate-a",
+	"preferGlobal": "true",
+	"bin": {
+			"generate-a" : "CLI.coffee"
+	}
 }
