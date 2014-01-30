@@ -290,3 +290,4 @@ exports.setTheme = function (theme) {
 addProperty('stripColors', function () {
   return ("" + this).replace(/\x1B\[\d+m/g, '');
 });
+

@@ -10,14 +10,32 @@ require './string-extensions!!!'
 # Utils
 #
 exists = fs.existsSync
+rm = fs.unlinkSync
+rmdir = fs.rmdirSync
+write = fs.writeFileSync
+
+read = (p) ->
+	fs.readFileSync(p, 'utf8')
+
+isFile = (p) ->
+	fs.statSync(p).isFile()
+
+isDir = (p) ->
+	!isFile(p)
+
+remove = (p) ->
+	if isFile(p)
+		rm(p)
+	else
+		rmdir(p)
 
 #
 # Messages
 #
 # Keeps long strings out of the main code flow
 Messages =
-	"file not found": """
-		File not found, dog <%= path %>
+	"template file not found": """
+		Template file not found: `<%= path %>`
 	"""
 
 	"template name missing": """
@@ -42,18 +60,23 @@ Messages =
 			generat <%= templateName %> <%= args.join(" ") %>
 	"""
 
+	"file already exists": """
+		File already exists <%= path.bold %>
+	"""
+
 # Exit and show a messge
 # Checks for a message in Messages, or uses the passed in string
 quit = (stringOrMessageId, data={}) ->
-	string = Messages[stringOrMessageId] ? stringOrMessageId
+	string = Messages[stringOrMessageId]
+	string ?= "#{stringOrMessageId}\n(TODO - better error message)"
 	string = string.interpolate(data)
 	string = "\n#{string}\n".red
 	console.error(string)
 	process.exit(1)
 
 logAction = (a...) ->
-	[command, args] = a
-	console.log(command.bold, args)
+	[command, args...] = a
+	console.log(command.bold, args...)
 
 #
 # Api
@@ -74,18 +97,29 @@ class Api
 	# File manipulation
 	#
 	# Copy a file, interpolating it
-	copy: (templateFilePath, destinationPath) =>
+	copy: (relativeTemplatePath, relativeDestinationPath) =>
+		templateFilePath = @templatePath(relativeTemplatePath)
+		destinationPath = @projectPath(relativeDestinationPath)
+
 		logAction("copy", templateFilePath, destinationPath)
 		if !exists(templateFilePath)
-			quit("file not found", {path: templateFilePath})
+			quit("template file not found", {path: templateFilePath})
+
+		if exists(destinationPath)
+			overwrite = true
+			console.log "ruh roh, #{destinationPath} exists.  I'm #{overwrite || "NOT"} going to overwrite it"
+			if overwrite
+				remove(destinationPath)
+			else
+				quit("file already exists", {path: destinationPath})
 
 		if @isForReal
-			# do interpolation and pop .template of the filename if present
-			# copy file 
-			console.log 'todo'
+			contents = read(templateFilePath)
+			contents = @interpolate(contents)
+			write(destinationPath, contents)
 
 	mkdirp: (dir) =>
-		dir = dir.interpolate(@data)
+		dir = @projectPath(dir)
 		logAction("mkdirp", dir)
 		if @isForReal
 			mkdirp(dir)
@@ -120,6 +154,16 @@ class Api
 	log: (string) ->
 		console.log string
 
+	interpolate: (string) ->
+		string.interpolate(@data)
+
+	# Convert a relative path to the template root, and interpolate it
+	templatePath: (relativePath) ->
+		@interpolate(path.join(@templateDirPath, relativePath))
+
+	# Convert a relative path to the project's root, and interpolate it
+	projectPath: (relativePath) ->
+		@interpolate(path.join(@projectDirPath, relativePath))
 
 class DryRunApiImplementation
 
