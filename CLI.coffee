@@ -52,12 +52,14 @@ class Api
 		@templates.push({templateName, args, runFn})
 
 	#
-	# File system
+	# File manipulation
 	#
 	copy: (templateFilePath, destinationPath) =>
 		logAction("copy", templateFilePath, destinationPath)
 		if @isForReal
-			fs.mkdir(dir)
+			# do interpolation and pop .template of the filename if present
+			# copy file 
+			1
 
 	mkdir: (dir) =>
 		logAction("mkdir", dir)
@@ -65,18 +67,28 @@ class Api
 			fs.mkdir(dir)
 
 	insertString:({file, string, before, after}) =>
-		if !before? && !after?
+		if !exists(file)
+			quite("TODO - no file")
+
+		stringToFind = before ? after
+
+		if !stringToFind?
 			quit("""TODO - need before or after""")
+
+		contents = fs.readFileSync(file)
+		stringIndex = -1
+		if stringIndex == -1
+			quit("Didn't find string: `#{string}` in file: `#{file}`")
 
 		if before
 			logAction("TODO inserting string before")
+			if @isForReal
+				updateContentsBlahBlah()
 
 		if after
 			logAction("TODO inserting string after")
-
-			didntFindString = true
-			if didntFindString
-				quit("Didn't find string: `#{string}` in file: `#{file}`")
+			if @isForReal
+				updateContentsBlahBlah()
 
 	# 
 	# Misc
