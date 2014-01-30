@@ -2,44 +2,58 @@
 fs = require 'fs'
 path = require 'path'
 mkdirp = require './mkdirp'
-colors = require './colors'
+require './string-extensions!!!'
 
 [_coffee, _cliPath, templateName, argv...] = process.argv
 
 #
 # Utils
 #
-extend = (target, source) ->
-	for k, v of source
-		target[k] = v
-
-# Simple JavaScript Templating
-# John Resig - http://ejohn.org/ - MIT Licensed
-interpolate = (str, data) ->
-	return require('./interpolate')(str, data)
-
 exists = fs.existsSync
 
+#
+# Messages
+#
+# Keeps long strings out of the main code flow
+Messages =
+	"file not found": """
+		File not found, dog <%= path %>
+	"""
+
+	"template name missing": """
+		You must provide a template name to generate.  Available templates:
+
+				<%= availableTemplateNames.join(", ") %>
+
+		Try it again like:
+
+				generat <%= availableTemplateNames[0] %>
+	"""
+
+ "template not found": """
+		I didn't find `<%= templateName %>` in the available templates:
+
+				<%= availableTemplateNames.join(", ") %>
+	"""
+
+	"missing arguments": """
+		You didn't provide enough arguments.  Usage:
+
+			generat <%= templateName %> <%= args.join(" ") %>
+	"""
+
 # Exit and show a messge
-quit = (message) ->
-	message = "\n#{message}\n"
-	console.error(message.red)
+# Checks for a message in Messages, or uses the passed in string
+quit = (stringOrMessageId, data={}) ->
+	string = Messages[stringOrMessageId] ? stringOrMessageId
+	string = string.interpolate(data)
+	string = "\n#{string}\n".red
+	console.error(string)
 	process.exit(1)
 
 logAction = (a...) ->
 	[command, args] = a
 	console.log(command.bold, args)
-#
-# Extend String prototype w/ helpers
-#
-# Watch out devs!  `for in` loops over a string object may not behave as
-# expected.  I suggest you run your code before shipping directly to
-# production, and not including this file in your main app.
-#
-extend String.prototype,
-	camelcase: ->
-		@ + "camel"
-
 
 #
 # Api
@@ -59,15 +73,19 @@ class Api
 	#
 	# File manipulation
 	#
+	# Copy a file, interpolating it
 	copy: (templateFilePath, destinationPath) =>
 		logAction("copy", templateFilePath, destinationPath)
+		if !exists(templateFilePath)
+			quit("file not found", {path: templateFilePath})
+
 		if @isForReal
 			# do interpolation and pop .template of the filename if present
 			# copy file 
 			console.log 'todo'
 
 	mkdirp: (dir) =>
-		dir = @interpolate(dir)
+		dir = dir.interpolate(@data)
 		logAction("mkdirp", dir)
 		if @isForReal
 			mkdirp(dir)
@@ -79,7 +97,7 @@ class Api
 		stringToFind = before ? after
 
 		if !stringToFind?
-			quit("""TODO - need before or after""")
+			quit("TODO - need before or after")
 
 		contents = fs.readFileSync(file)
 		stringIndex = -1
@@ -101,9 +119,6 @@ class Api
 	#
 	log: (string) ->
 		console.log string
-
-	interpolate: (string) ->
-		interpolate(string, @data)
 
 
 class DryRunApiImplementation
@@ -143,32 +158,16 @@ template = (t for t in availableTemplates when t.templateName == templateName)[0
 
 # Ensure user provided a template name
 if !templateName
-	quit("""
-		You must provide a template name to generate.  Available templates:
-
-				#{availableTemplateNames.join(", ")}
-
-		Try it again like:
-
-				generate-a #{availableTemplateNames[0]}
-	""")
+	quit("template name missing", {availableTemplateNames})
 
 # Ensure the provided template name is valid
 if !template
-	quit("""
-		I didn't find `#{templateName}` in the available templates:
-
-				#{availableTemplateNames.join(", ")}
-	""")
+	quit("template not found", {availableTemplateNames, templateName})
 
 # Ensure correct args were given
 #console.log template.args, argv
 if argv.length < template.args.length
-	quit("""
-		You didn't provide enough arguments.  Usage:
-
-			generat #{template.templateName} #{template.args.join(" ")}
-	""")
+	quit("missing arguments", {templateName, args: template.args})
 
 for argName, i in template.args
 	argValue = argv[i]
