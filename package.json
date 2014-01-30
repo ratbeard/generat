@@ -1,14 +1,14 @@
 {
-  "name": "generate-a",
+  "name": "generat",
   "version": "0.0.0",
   "description": "Template generator for a local project",
-  "main": "index.coffee",
+  "main": "generat.coffee",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ratbeard/generate-a"
+    "url": "https://github.com/ratbeard/generat"
   },
   "keywords": [
     "template",
@@ -18,12 +18,12 @@
   "author": "Mike \"Spaceship\" Frawley",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ratbeard/generate-a/issues"
+    "url": "https://github.com/ratbeard/generat/issues"
   },
-  "homepage": "https://github.com/ratbeard/generate-a",
+  "homepage": "https://github.com/ratbeard/generat",
   "preferGlobal": "true",
   "bin": {
-    "generat": "CLI.coffee"
+    "generat": "generat.coffee"
   },
   "devDependencies": {
     "nodemon": "~1.0.14"
