@@ -1,6 +1,7 @@
 #! /usr/bin/env coffee
 fs = require 'fs'
 path = require 'path'
+colors = require './colors'
 
 [_coffee, _cliPath, templateName, args...] = process.argv
 #console.log args
@@ -18,11 +19,12 @@ exists = fs.existsSync
 
 # Exit and show a messge
 quit = (message) ->
-	console.error(message)
+	console.error(message.red)
 	process.exit(1)
 
-logAction = (message) ->
-	console.log(message)
+logAction = (a...) ->
+	[command, args] = a
+	console.log(command.bold, args)
 #
 # Extend String prototype w/ helpers
 #
@@ -53,21 +55,24 @@ class Api
 	# File system
 	#
 	copy: (templateFilePath, destinationPath) =>
-		logAction("copy")
-		@implementation.copy()
+		logAction("copy", templateFilePath, destinationPath)
+		if @isForReal
+			fs.mkdir(dir)
 
-	mkdir: () =>
-		logAction("mkdir")
+	mkdir: (dir) =>
+		logAction("mkdir", dir)
+		if @isForReal
+			fs.mkdir(dir)
 
 	insertString:({file, string, before, after}) =>
 		if !before? && !after?
-			after = true
+			quit("""TODO - need before or after""")
 
 		if before
-			logAction("inserting string before")
+			logAction("TODO inserting string before")
 
 		if after
-			logAction("inserting string after")
+			logAction("TODO inserting string after")
 
 			didntFindString = true
 			if didntFindString

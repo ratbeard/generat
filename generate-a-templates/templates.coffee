@@ -6,6 +6,7 @@ module.exports = (generat) ->
 
 	register "bot", ":name", () ->
 		log "hi"
+		mkdir("foo")
 
 
 
