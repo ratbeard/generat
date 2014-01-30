@@ -1,0 +1,24 @@
+{
+  "name": "generate-a",
+  "version": "0.0.0",
+  "description": "Template generator for a local project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ratbeard/generate-a"
+  },
+  "keywords": [
+    "template",
+    "generator",
+    "ez"
+  ],
+  "author": "Mike \"Spaceship\" Frawley",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ratbeard/generate-a/issues"
+  },
+  "homepage": "https://github.com/ratbeard/generate-a"
+}
