@@ -1,10 +1,10 @@
 #! /usr/bin/env coffee
 fs = require 'fs'
 path = require 'path'
+mkdirp = require './mkdirp'
 colors = require './colors'
 
-[_coffee, _cliPath, templateName, args...] = process.argv
-#console.log args
+[_coffee, _cliPath, templateName, argv...] = process.argv
 
 #
 # Utils
@@ -13,12 +13,16 @@ extend = (target, source) ->
 	for k, v of source
 		target[k] = v
 
-#find = (
+# Simple JavaScript Templating
+# John Resig - http://ejohn.org/ - MIT Licensed
+interpolate = (str, data) ->
+	return require('./interpolate')(str, data)
 
 exists = fs.existsSync
 
 # Exit and show a messge
 quit = (message) ->
+	message = "\n#{message}\n"
 	console.error(message.red)
 	process.exit(1)
 
@@ -45,6 +49,7 @@ class Api
 	constructor: (@templateName, @templateDirPath, @projectDirPath) ->
 		@isForReal = false
 		@templates = []
+		@data = {}
 	#
 	# Template registration
 	#
@@ -59,12 +64,13 @@ class Api
 		if @isForReal
 			# do interpolation and pop .template of the filename if present
 			# copy file 
-			1
+			console.log 'todo'
 
-	mkdir: (dir) =>
-		logAction("mkdir", dir)
+	mkdirp: (dir) =>
+		dir = @interpolate(dir)
+		logAction("mkdirp", dir)
 		if @isForReal
-			fs.mkdir(dir)
+			mkdirp(dir)
 
 	insertString:({file, string, before, after}) =>
 		if !exists(file)
@@ -96,6 +102,10 @@ class Api
 	log: (string) ->
 		console.log string
 
+	interpolate: (string) ->
+		interpolate(string, @data)
+
+
 class DryRunApiImplementation
 
 #
@@ -119,13 +129,14 @@ readGeneratorFile = ->
 
 	api = new Api(templateName, templateDirPath, projectDir)
 	fn(api)
-	api.templates
+	api
 
 #
 # Run templates
 #
 
-availableTemplates = readGeneratorFile()
+api = readGeneratorFile()
+availableTemplates = api.templates
 availableTemplateNames = availableTemplates.map((t) -> t.templateName)
 template = null
 template = (t for t in availableTemplates when t.templateName == templateName)[0]
@@ -150,11 +161,24 @@ if !template
 				#{availableTemplateNames.join(", ")}
 	""")
 
+# Ensure correct args were given
+#console.log template.args, argv
+if argv.length < template.args.length
+	quit("""
+		You didn't provide enough arguments.  Usage:
 
-console.log template
+			generat #{template.templateName} #{template.args.join(" ")}
+	""")
+
+for argName, i in template.args
+	argValue = argv[i]
+	api.data[argName] = argValue
+
 {runFn} = template
+
 # Give it a dry run
 runFn()
 
 # Run it for real!
-#template.run(false)
+api.isForReal = true
+runFn()

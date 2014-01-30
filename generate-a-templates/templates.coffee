@@ -1,12 +1,11 @@
 module.exports = (generat) ->
-	{register, log, mkdir, copy} = generat
+	{register, log, mkdirp, copy} = generat
 
 	 #console.log(generat)   # <- Uncomment and run me to see the full api
 
 
-	register "bot", ":name", () ->
-		log "hi"
-		mkdir("foo")
+	register "bot", ["name"], ->
+		mkdirp("tmp/<%= name %>")
 
 
 
