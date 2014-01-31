@@ -24,8 +24,5 @@
   "preferGlobal": "true",
   "bin": {
     "generat": "generat.coffee"
-  },
-  "devDependencies": {
-    "nodemon": "~1.0.14"
   }
 }
