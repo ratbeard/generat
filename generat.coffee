@@ -67,13 +67,34 @@ Messages =
 		File already exists <%= path.bold %>
 	"""
 
+	"logo": """
+
+
+                        _..----.._    _
+                      .'  .--.    "-.(0)_
+          '-.__.-'"'=:|   ,  _)_ \__ . c\'-..
+                       '''------'---''---'-"
+      ▄████ ▓█████  ███▄    █ ▓█████  ██▀███   ▄▄▄     ▄▄▄█████▓▓█████ 
+     ██▒ ▀█▒▓█   ▀  ██ ▀█   █ ▓█   ▀ ▓██ ▒ ██▒▒████▄   ▓  ██▒ ▓▒▓█   ▀ 
+    ▒██░▄▄▄░▒███   ▓██  ▀█ ██▒▒███   ▓██ ░▄█ ▒▒██  ▀█▄ ▒ ▓██░ ▒░▒███   
+    ░▓█  ██▓▒▓█  ▄ ▓██▒  ▐▌██▒▒▓█  ▄ ▒██▀▀█▄  ░██▄▄▄▄██░ ▓██▓ ░ ▒▓█  ▄ 
+    ░▒▓███▀▒░▒████▒▒██░   ▓██░░▒████▒░██▓ ▒██▒ ▓█   ▓██▒ ▒██▒ ░ ░▒████▒
+     ░▒   ▒ ░░ ▒░ ░░ ▒░   ▒ ▒ ░░ ▒░ ░░ ▒▓ ░▒▓░ ▒▒   ▓▒█░ ▒ ░░   ░░ ▒░ ░
+      ░   ░  ░ ░  ░░ ░░   ░ ▒░ ░ ░  ░  ░▒ ░ ▒░  ▒   ▒▒ ░   ░     ░ ░  ░
+    ░ ░   ░    ░      ░   ░ ░    ░     ░░   ░   ░   ▒    ░         ░   
+          ░    ░  ░         ░    ░  ░   ░           ░  ░           ░  ░
+                                                                   
+								 
+	"""
+
 # Exit and show a messge
 # Checks for a message in Messages, or uses the passed in string
-quit = (stringOrMessageId, data={}) ->
+quit = (stringOrMessageId, data={}, options={}) ->
+	{color, interpolate} = options
 	string = Messages[stringOrMessageId]
 	string ?= "#{stringOrMessageId}\n(TODO - better error message)"
-	string = string.interpolate(data)
-	string = "\n#{string}\n".red
+	string = string.interpolate(data) unless interpolate == false
+	string = "\n#{string}\n"[color ? 'red']
 	console.error(string)
 	process.exit(1)
 
@@ -87,8 +108,8 @@ logAction = (a...) ->
 [_coffee, _cliPath, templateName, argv...] = process.argv
 
 # TODO - help message
-#if argv.length == 0 || templateName == 'help'
-	#console.log 'hi'
+if argv.length == 0 || templateName == 'help'
+	quit("logo", null, interpolate: false, color: 'redBG')
 
 # Generate the template dir
 if templateName == "init"
