@@ -10,11 +10,46 @@
 // - formatting functions like 'camelcase'
 // - interpolate(data),  which is taken from: _.template
 //
-addProperty("camelcase", function() {
-	return "camel" + this
-})
+//////////////////////////////////////
+// Borrow a few _.string functions
+//////////////////////////////////////
+var _s = {
+	titleize: function(str){
+		if (str == null) return '';
+		return String(str).replace(/(?:^|\s)\S/g, function(c){ return c.toUpperCase(); });
+	},
+	camelize: function(str){
+		return str.trim().replace(/[-_\s]+(.)?/g, function(match, c){ return c.toUpperCase(); });
+	},
+	underscored: function(str){
+		return str.trim().replace(/([a-z\d])([A-Z]+)/g, '$1_$2').replace(/[-\s]+/g, '_').toLowerCase();
+	},
+	dasherize: function(str){
+		return str.trim().replace(/([A-Z])/g, '-$1').replace(/[-_\s]+/g, '-').toLowerCase();
+	},
+	classify: function(str){
+		return _s.titleize(String(str).replace(/_/g, ' ')).replace(/\s/g, '');
+	},
+	capitalize : function(str){
+		str = str == null ? '' : String(str);
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	},
+	humanize: function(str){
+		return _s.capitalize(_s.underscored(str).replace(/_id$/,'').replace(/_/g, ' '));
+	},
+}
+
+for (k in _s) {
+	addProperty(k, function() {
+		return _s[k](this)
+	})
+	//console.log(k,": hello there, my man!"[k])
+}
 
 
+//////////////////////////////////////
+// Borrow _.template
+//////////////////////////////////////
 String.prototype.interpolate = function(data) {
 	return _.template(this, data)
 }
@@ -114,6 +149,9 @@ _.template = function(text, data, settings) {
 
 
 
+//////////////////////////////////////
+// Borrow some of colors.js
+//////////////////////////////////////
 /*
 colors.js
 
