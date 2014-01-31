@@ -7,5 +7,3 @@ module.exports = (generat) ->
 		mkdirp("tmp/{{name}}")
 		copy("bot.coffee", "tmp/{{name}}/bot.coffee")
 
-
-

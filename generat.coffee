@@ -92,7 +92,6 @@ logAction = (a...) ->
 
 # Generate the template dir
 if templateName == "init"
-	console.log "init"
 	mkdirp.sync(generatTemplateDir)
 	a = path.join(__dirname, generatTemplateDir, "default-templates.coffee")
 	b = path.join(generatTemplateDir, "templates.coffee")
