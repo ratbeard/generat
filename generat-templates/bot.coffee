@@ -1,3 +1,3 @@
-class <%= name.camelize %>Bot
+class {{name.camelize}}Bot
 	foo: 'cool'
 

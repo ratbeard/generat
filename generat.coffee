@@ -4,7 +4,10 @@ path = require 'path'
 mkdirp = require './mkdirp'
 require './string-extensions!!!'
 
-[_coffee, _cliPath, templateName, argv...] = process.argv
+#
+# VARS!
+#
+generatTemplateDir = "generat-templates"
 
 #
 # Utils
@@ -79,6 +82,26 @@ logAction = (a...) ->
 	console.log(command.bold, args...)
 
 #
+# Arg parsing
+#
+[_coffee, _cliPath, templateName, argv...] = process.argv
+
+# TODO - help message
+#if argv.length == 0 || templateName == 'help'
+	#console.log 'hi'
+
+# Generate the template dir
+if templateName == "init"
+	console.log "init"
+	mkdirp.sync(generatTemplateDir)
+	a = path.join(__dirname, generatTemplateDir, "default-templates.coffee")
+	b = path.join(generatTemplateDir, "templates.coffee")
+	contents = read(a)
+	write(b, contents)
+	process.exit(0)
+
+
+#
 # Api
 #
 # What gets passed into a template definitions file
@@ -122,7 +145,7 @@ class Api
 		dir = @projectPath(dir)
 		logAction("mkdirp", dir)
 		if @isForReal
-			mkdirp(dir)
+			mkdirp.sync(dir)
 
 	insertString:({file, string, before, after}) =>
 		if !exists(file)
@@ -172,7 +195,7 @@ class DryRunApiImplementation
 #
 readGeneratorFile = ->
 	projectDir = process.cwd()
-	templateDirPath = path.join(projectDir, "generat-templates")
+	templateDirPath = path.join(projectDir, generatTemplateDir)
 	templateDefinitionFile = path.join(templateDirPath, "templates.coffee")
 
 	if !exists(templateDirPath)

@@ -2,22 +2,19 @@ Dece template generation
 
 		npm install -g generat
 
-		# todo
+		# Creates a generat-templates/ dir into your current dir 
 		generat init
 
-		tree ./generat-templates
-		# todo ...
+		# Hack that generat-templates/templates.coffee file...
 
-
+		# Now run that bot generator you just made!
 		generat bot jarjarmuppet
-
 
 TODO:
 	
-	camelcase, etc string fns
-	generat init
-	a few docs
 	publish to npm
+	use for bots!
 	insertString
+	use for angular!
 	improve dry-run implementation
 	logo.  rat ascii art?
