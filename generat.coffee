@@ -37,34 +37,41 @@ remove = (p) ->
 #
 # Keeps long strings out of the main code flow
 Messages =
+	"template dir not found": """
+		Template dir not found `{{templateDirPath}}`.
+
+		You should run `generat init` to create this dir in your project root.
+
+	"""
+
 	"template file not found": """
-		Template file not found: `<%= path %>`
+		Template file not found: `{{ path }}`
 	"""
 
 	"template name missing": """
 		You must provide a template name to generate.  Available templates:
 
-				<%= availableTemplateNames.join(", ") %>
+				{{ availableTemplateNames.join(", ") }}
 
 		Try it again like:
 
-				generat <%= availableTemplateNames[0] %>
+				generat {{ availableTemplateNames[0] }}
 	"""
 
  "template not found": """
-		I didn't find `<%= templateName %>` in the available templates:
+		I didn't find `{{ templateName }}` in the available templates:
 
-				<%= availableTemplateNames.join(", ") %>
+				{{ availableTemplateNames.join(", ") }}
 	"""
 
 	"missing arguments": """
 		You didn't provide enough arguments.  Usage:
 
-			generat <%= templateName %> <%= args.join(" ") %>
+			generat {{templateName}} {{args}}
 	"""
 
 	"file already exists": """
-		File already exists <%= path.bold %>
+		File already exists {{ path.bold }}
 	"""
 
 	"logo": """
@@ -108,7 +115,7 @@ logAction = (a...) ->
 [_coffee, _cliPath, templateName, argv...] = process.argv
 
 # TODO - help message
-if argv.length == 0 || templateName == 'help'
+if templateName == 'help'
 	quit("logo", null, interpolate: false, color: 'redBG')
 
 # Generate the template dir
