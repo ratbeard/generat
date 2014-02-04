@@ -176,27 +176,41 @@ class Api
 
 	insertString:({file, string, before, after}) =>
 		if !exists(file)
-			quite("TODO - no file")
+			quite("No file")
 
 		stringToFind = before ? after
 
 		if !stringToFind?
-			quit("TODO - need before or after")
+			quit("Need before or after")
 
-		contents = fs.readFileSync(file)
-		stringIndex = -1
+		contents = fs.readFileSync(file).toString()
+
+		stringIndex = contents.indexOf(stringToFind)
 		if stringIndex == -1
-			quit("Didn't find string: `#{string}` in file: `#{file}`")
+			quit("Didn't find string: `#{stringToFind}` in file: `#{file}`")
 
+		# Be nice and preserve indentation.  Clean this up
+		indentation = ''
+		while c != "\n"
+			c = contents[--stringIndex]
+			indentation = indentation + c if c != '\n'
+			
+		string = @interpolate(string)
+		
 		if before
-			logAction("TODO inserting string before")
-			if @isForReal
-				updateContentsBlahBlah()
+			replacementString = "#{string}\n#{indentation}#{stringToFind}"
 
 		if after
-			logAction("TODO inserting string after")
-			if @isForReal
-				updateContentsBlahBlah()
+			replacementString = "#{stringToFind}\n#{indentation}#{string}"
+
+		contents = contents.replace(stringToFind, replacementString)
+		#console.log contents
+
+		if @isForReal
+			logAction "inserting string", string
+			write(file, contents)
+
+
 
 	# 
 	# Misc
@@ -226,7 +240,7 @@ readGeneratorFile = ->
 	templateDefinitionFile = path.join(templateDirPath, "templates.coffee")
 
 	if !exists(templateDirPath)
-		quit("template dir not found: `#{templateDirPath}`")
+		quit("template dir not found",{templateDirPath})
 
 	if !exists(templateDefinitionFile)
 		quit("template definition file not found: #{templateDefinitionFile}")
@@ -261,7 +275,8 @@ if !template
 # Ensure correct args were given
 #console.log template.args, argv
 if argv.length < template.args.length
-	quit("missing arguments", {templateName, args: template.args})
+	argsString = template.args.map((a) -> "<#{a.bold}>").join(', ')
+	quit("missing arguments", {templateName, args: argsString})
 
 for argName, i in template.args
 	argValue = argv[i]
